@@ -63,13 +63,17 @@ jobs:
           .\vcpkg\vcpkg install opencv4:x64-windows-static
 
       - name: Configure and build
+        shell: pwsh
         run: |
           $env:VCPKG_ROOT = "${PWD}/vcpkg"
           mkdir build
           cd build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release
+          cmake .. `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_VERBOSE_MAKEFILE=ON `
+            -DOpenCV_DIR="$env:VCPKG_ROOT/installed/x64-windows-static/share/opencv"
           cmake --build . --config Release
-        shell: pwsh
 
       - name: Upload motion_detector binary (Windows)
         uses: actions/upload-artifact@v4

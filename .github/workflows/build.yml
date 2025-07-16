@@ -38,12 +38,23 @@ jobs:
           name: video_cropper-linux
           path: build/croper/video_cropper
 
-   build-windows:
+  build-windows:
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Cache vcpkg
+        uses: actions/cache@v3
+        with:
+          path: |
+            vcpkg/installed
+            vcpkg/buildtrees
+            vcpkg/packages
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
 
       - name: Install OpenCV via vcpkg
         run: |

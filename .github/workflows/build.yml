@@ -38,7 +38,7 @@ jobs:
           name: video_cropper-linux
           path: build/croper/video_cropper
 
-  build-windows:
+   build-windows:
     runs-on: windows-latest
 
     steps:
@@ -53,10 +53,12 @@ jobs:
 
       - name: Configure and build
         run: |
+          $env:VCPKG_ROOT = "${PWD}/vcpkg"
           mkdir build
           cd build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" -DCMAKE_BUILD_TYPE=Release
           cmake --build . --config Release
+        shell: pwsh
 
       - name: Upload motion_detector binary (Windows)
         uses: actions/upload-artifact@v4

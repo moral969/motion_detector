@@ -1,0 +1,71 @@
+name: Build Motion Tools
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake g++ libopencv-dev
+
+      - name: Configure and build
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make
+
+      - name: Upload motion_detector binary (Linux)
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion_detector-linux
+          path: build/motion_detector
+
+      - name: Upload video_cropper binary (Linux)
+        uses: actions/upload-artifact@v4
+        with:
+          name: video_cropper-linux
+          path: build/croper/video_cropper
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install OpenCV via vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install opencv
+
+      - name: Configure and build
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release
+
+      - name: Upload motion_detector binary (Windows)
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion_detector-windows
+          path: build/Release/motion_detector.exe
+
+      - name: Upload video_cropper binary (Windows)
+        uses: actions/upload-artifact@v4
+        with:
+          name: video_cropper-windows
+          path: build/croper/Release/video_cropper.exe
